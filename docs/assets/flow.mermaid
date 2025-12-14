@@ -1,0 +1,35 @@
+flowchart LR
+  subgraph Clients
+    shopper[Shopper<br/>Browser]
+    adminUser[Admin<br/>Browser/Telegram/Slack]
+  end
+
+  subgraph Frontends
+    storefront[Storefront<br/>Next.js on Cloudflare Pages]
+    adminSPA[Admin UI<br/>Vite SPA on Vercel]
+    aiGateway[AI Gateway<br/>Vercel AI SDK]
+  end
+
+  subgraph Backend
+    api[API<br/>Hono on Cloudflare Workers]
+    db[(DB<br/>Phase 1: D1<br/>Phase 2: Neon)]
+    r2[(Cloudflare R2<br/>Images)]
+  end
+
+  subgraph ExternalServices
+    stripe[(Stripe<br/>Payment Provider)]
+  end
+
+  shopper --> storefront
+  adminUser --> adminSPA
+  adminUser --> aiGateway
+
+  storefront -->|Public API| api
+  adminSPA -->|Admin API| api
+  aiGateway -->|Tool calls / Admin API| api
+
+  api --> db
+  api --> r2
+
+  storefront -->|Create Checkout| stripe
+  stripe -->|Webhook| api

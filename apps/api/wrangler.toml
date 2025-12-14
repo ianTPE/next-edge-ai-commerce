@@ -1,0 +1,30 @@
+name = "ec-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+# Run: wrangler d1 create ec-demo
+# Then replace YOUR_D1_DATABASE_ID with the actual ID
+[[d1_databases]]
+binding = "DB"
+database_name = "ec-demo"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# R2 Storage binding
+# Run: wrangler r2 bucket create ec-media
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "ec-media"
+
+[vars]
+BETTER_AUTH_URL = "https://ec-api.YOUR_SUBDOMAIN.workers.dev"
+AUTH_COOKIE_NAME = "admin_session"
+CORS_ORIGIN = "https://your-storefront.pages.dev,https://your-admin.vercel.app"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# Required secrets:
+# - BETTER_AUTH_SECRET
+# - STRIPE_SECRET_KEY
+# - STRIPE_WEBHOOK_SECRET
+# - OPENAI_API_KEY (optional, for AI features)
