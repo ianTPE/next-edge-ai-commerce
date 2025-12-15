@@ -4,6 +4,11 @@ import Image from 'next/image';
 export const runtime = 'edge';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ec-api.ertiach.workers.dev';
+const R2_BASE_URL = 'https://pub-376ad58b5142480bbd54b6f33055bfb1.r2.dev';
+
+function getProductImageUrl(slug: string): string {
+  return `${R2_BASE_URL}/images/products/${slug}.png`;
+}
 
 interface Product {
   id: string;
@@ -83,9 +88,13 @@ export default async function ProductsPage() {
                 className="group rounded-lg border bg-white p-4 transition hover:shadow-lg"
               >
                 <div className="relative mb-4 aspect-square overflow-hidden rounded-md bg-gray-100">
-                  <div className="flex h-full items-center justify-center text-gray-400">
-                    {product.name.charAt(0)}
-                  </div>
+                  <Image
+                    src={getProductImageUrl(product.slug)}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
                 </div>
                 <h2 className="font-medium text-gray-900 group-hover:text-black">{product.name}</h2>
                 <p className="line-clamp-2 text-sm text-gray-500">{product.description}</p>
