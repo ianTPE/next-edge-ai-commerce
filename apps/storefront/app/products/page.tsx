@@ -1,13 +1,46 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
-// TODO: Fetch from API
-async function getProducts() {
-  // Placeholder data
-  return [
-    { id: '1', name: '商品 A', slug: 'product-a', priceCents: 29900, description: '優質商品 A' },
-    { id: '2', name: '商品 B', slug: 'product-b', priceCents: 39900, description: '優質商品 B' },
-    { id: '3', name: '商品 C', slug: 'product-c', priceCents: 19900, description: '優質商品 C' },
-  ];
+export const runtime = 'edge';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ec-api.ertiach.workers.dev';
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  priceCents: number;
+  compareAtPriceCents: number | null;
+  stockQuantity: number;
+  isActive: boolean;
+}
+
+interface ProductsResponse {
+  ok: boolean;
+  data: {
+    items: Product[];
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
+async function getProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/products`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) {
+      console.error('Failed to fetch products:', res.status);
+      return [];
+    }
+    const json: ProductsResponse = await res.json();
+    return json.data?.items || [];
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
 }
 
 function formatPrice(cents: number) {
@@ -39,20 +72,35 @@ export default async function ProductsPage() {
       {/* Products Grid */}
       <div className="container mx-auto px-4 py-8">
         <h1 className="mb-8 text-2xl font-bold">所有商品</h1>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/products/${product.slug}`}
-              className="group rounded-lg border bg-white p-4 transition hover:shadow-lg"
-            >
-              <div className="mb-4 aspect-square rounded-md bg-gray-100"></div>
-              <h2 className="font-medium text-gray-900 group-hover:text-black">{product.name}</h2>
-              <p className="text-sm text-gray-500">{product.description}</p>
-              <p className="mt-2 font-bold text-gray-900">{formatPrice(product.priceCents)}</p>
-            </Link>
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <p className="text-gray-500">目前沒有商品</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/products/${product.slug}`}
+                className="group rounded-lg border bg-white p-4 transition hover:shadow-lg"
+              >
+                <div className="relative mb-4 aspect-square overflow-hidden rounded-md bg-gray-100">
+                  <div className="flex h-full items-center justify-center text-gray-400">
+                    {product.name.charAt(0)}
+                  </div>
+                </div>
+                <h2 className="font-medium text-gray-900 group-hover:text-black">{product.name}</h2>
+                <p className="line-clamp-2 text-sm text-gray-500">{product.description}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="font-bold text-gray-900">{formatPrice(product.priceCents)}</p>
+                  {product.compareAtPriceCents && (
+                    <p className="text-sm text-gray-400 line-through">
+                      {formatPrice(product.compareAtPriceCents)}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
