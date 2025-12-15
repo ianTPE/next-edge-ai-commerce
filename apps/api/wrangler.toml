@@ -9,7 +9,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "ec-demo"
-database_id = "YOUR_D1_DATABASE_ID"
+database_id = "7a0f3be7-d384-42db-aecf-b5b017d75375"
 
 # R2 Storage binding
 # Run: wrangler r2 bucket create ec-media
@@ -18,7 +18,7 @@ binding = "R2"
 bucket_name = "ec-media"
 
 [vars]
-BETTER_AUTH_URL = "https://ec-api.YOUR_SUBDOMAIN.workers.dev"
+BETTER_AUTH_URL = "https://ec-api.ertiach.workers.dev"
 AUTH_COOKIE_NAME = "admin_session"
 CORS_ORIGIN = "https://your-storefront.pages.dev,https://your-admin.vercel.app"
 

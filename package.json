@@ -14,10 +14,10 @@
     "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "prettier": "^3.1.0",
-    "turbo": "^2.3.0",
-    "typescript": "^5.3.0"
+    "@types/node": "^20.19.27",
+    "prettier": "^3.7.4",
+    "turbo": "^2.6.3",
+    "typescript": "^5.9.3"
   },
   "packageManager": "bun@1.1.0",
   "engines": {
