@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+export const runtime = 'edge';
+
 // TODO: Fetch from API
 async function getProduct(slug: string) {
   const products: Record<string, { id: string; name: string; slug: string; priceCents: number; description: string; stockQuantity: number }> = {
