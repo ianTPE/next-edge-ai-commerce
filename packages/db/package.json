@@ -17,7 +17,6 @@
     "drizzle-orm": "^0.36.0"
   },
   "devDependencies": {
-    "@repo/config": "workspace:*",
     "drizzle-kit": "^0.28.0",
     "typescript": "^5.3.0"
   }

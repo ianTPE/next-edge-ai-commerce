@@ -10,7 +10,6 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@repo/db": "workspace:*",
     "drizzle-orm": "^0.36.0",
     "hono": "^4.6.0",
     "stripe": "^17.0.0",
@@ -18,7 +17,6 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
-    "@repo/config": "workspace:*",
     "typescript": "^5.3.0",
     "wrangler": "^3.91.0"
   }
