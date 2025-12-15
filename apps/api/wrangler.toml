@@ -20,7 +20,7 @@ bucket_name = "ec-media"
 [vars]
 BETTER_AUTH_URL = "https://ec-api.ertiach.workers.dev"
 AUTH_COOKIE_NAME = "admin_session"
-CORS_ORIGIN = "https://your-storefront.pages.dev,https://your-admin.vercel.app"
+CORS_ORIGIN = "https://next-edge-ai-commerce.pages.dev,https://next-edge-ai-commerce-admin.vercel.app"
 
 # Secrets (set via: wrangler secret put SECRET_NAME)
 # Required secrets:
