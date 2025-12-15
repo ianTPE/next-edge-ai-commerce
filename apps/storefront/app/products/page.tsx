@@ -29,7 +29,7 @@ interface ProductsResponse {
 async function getProducts(): Promise<Product[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/products`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     });
     if (!res.ok) {
       console.error('Failed to fetch products:', res.status);
