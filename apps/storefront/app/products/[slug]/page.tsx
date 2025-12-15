@@ -1,20 +1,59 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 export const runtime = 'edge';
 
-// TODO: Fetch from API
-async function getProduct(slug: string) {
-  const products: Record<string, { id: string; name: string; slug: string; priceCents: number; description: string; stockQuantity: number }> = {
-    'product-a': { id: '1', name: '商品 A', slug: 'product-a', priceCents: 29900, description: '這是一個優質的商品 A，具有出色的品質和設計。', stockQuantity: 10 },
-    'product-b': { id: '2', name: '商品 B', slug: 'product-b', priceCents: 39900, description: '這是一個優質的商品 B，具有出色的品質和設計。', stockQuantity: 5 },
-    'product-c': { id: '3', name: '商品 C', slug: 'product-c', priceCents: 19900, description: '這是一個優質的商品 C，具有出色的品質和設計。', stockQuantity: 20 },
-  };
-  return products[slug] || null;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ec-api.ertiach.workers.dev';
+const R2_BASE_URL = 'https://pub-376ad58b5142480bbd54b6f33055bfb1.r2.dev';
+
+interface ProductImage {
+  id: string;
+  productId: string;
+  url: string;
+  sortOrder: number;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  description: string | null;
+  priceCents: number;
+  compareAtPriceCents: number | null;
+  stockQuantity: number;
+  isActive: boolean;
+  images: ProductImage[];
+}
+
+interface ProductResponse {
+  ok: boolean;
+  data: Product;
+}
+
+async function getProduct(slug: string): Promise<Product | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/products/${slug}`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const json: ProductResponse = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
 }
 
 function formatPrice(cents: number) {
   return `NT$ ${(cents / 100).toLocaleString()}`;
+}
+
+function getProductImageUrl(slug: string): string {
+  return `${R2_BASE_URL}/images/products/${slug}.png`;
 }
 
 export default async function ProductDetailPage({
@@ -52,17 +91,33 @@ export default async function ProductDetailPage({
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Image */}
-          <div className="aspect-square rounded-lg bg-gray-100"></div>
+          <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+            <Image
+              src={product.images?.[0]?.url || getProductImageUrl(product.slug)}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
+            />
+          </div>
 
           {/* Info */}
           <div>
             <h1 className="mb-4 text-3xl font-bold">{product.name}</h1>
-            <p className="mb-4 text-2xl font-bold text-gray-900">
-              {formatPrice(product.priceCents)}
-            </p>
+            <div className="mb-4 flex items-center gap-3">
+              <p className="text-2xl font-bold text-gray-900">
+                {formatPrice(product.priceCents)}
+              </p>
+              {product.compareAtPriceCents && (
+                <p className="text-lg text-gray-400 line-through">
+                  {formatPrice(product.compareAtPriceCents)}
+                </p>
+              )}
+            </div>
             <p className="mb-6 text-gray-600">{product.description}</p>
 
-            <div className="mb-6">
+            <div className="mb-6 flex items-center gap-4">
               <span
                 className={`inline-block rounded-full px-3 py-1 text-sm ${
                   product.stockQuantity > 0
@@ -72,6 +127,7 @@ export default async function ProductDetailPage({
               >
                 {product.stockQuantity > 0 ? `庫存: ${product.stockQuantity}` : '缺貨中'}
               </span>
+              <span className="text-sm text-gray-500">SKU: {product.sku}</span>
             </div>
 
             <button
